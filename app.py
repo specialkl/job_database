@@ -6,6 +6,7 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials # <--- NEW LIBRARY
 from prompts import JOB_EXTRACTION_PROMPT
+import traceback
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Job Extractor AI", layout="wide")
@@ -21,44 +22,28 @@ except FileNotFoundError:
     st.error("Secrets not found. If running locally, check .streamlit/secrets.toml")
     st.stop()
 
-# --- GOOGLE SHEETS FUNCTION ---
+# --- GOOGLE SHEETS FUNCTION
 def save_to_google_sheets(data_dict):
-    # The modern scopes (Google Auth uses slightly different URLs sometimes, but these are standard)
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-    
     try:
-        # Convert Streamlit secrets to a standard Python dictionary
-        credentials_dict = dict(st.secrets["gcp_service_account"])
+        # 1. Use gspread's internal helper to handle the secrets dict directly
+        # This automatically handles scopes and tokens for you.
+        client = gspread.service_account_from_dict(st.secrets["gcp_service_account"])
         
-        # Create credentials object
-        creds = Credentials.from_service_account_info(
-            credentials_dict,
-            scopes=scopes
-        )
-        
-        # Authorize gspread
-        client = gspread.authorize(creds)
-        
-        # Open the sheet
-        sheet_name = "Job Hunt Database"  # Make sure this matches exactly!
+        # 2. Open the sheet
+        sheet_name = "Job Hunt Database" 
         sheet = client.open(sheet_name).sheet1
         
-        # Prepare row data
+        # 3. Prepare row
         row = [str(data_dict.get(k, "")) for k in data_dict.keys()]
         
-        # Append
+        # 4. Append
         sheet.append_row(row)
         return True
-        
+
     except Exception as e:
-        # Detailed error logging
-        st.error(f"Google Sheets Error: {e}")
-        # If it's a specific API error, try to print the response body
-        if hasattr(e, 'response'):
-             st.write(getattr(e, 'response', 'No response text'))
+        st.error("❌ Google Sheets Error")
+        # This will print the FULL error trace so we can see exactly what's wrong
+        st.code(traceback.format_exc()) 
         return False
 
 # --- MAIN APP ---
