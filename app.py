@@ -63,7 +63,7 @@ if st.button("Extract & Save", type="primary"):
             genai.configure(api_key=gemini_key)
 
             model = genai.GenerativeModel(
-                            'gemini-1.5-flash-latest',
+                            'gemini-2.5-flash',
                             system_instruction=JOB_EXTRACTION_PROMPT
                         )
 

@@ -42,3 +42,6 @@ ENV/
 # Operating System files
 .DS_Store
 Thumbs.db
+
+# Local Debug Scripts
+debug.py
