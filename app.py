@@ -4,7 +4,7 @@ import requests
 import json
 import pandas as pd
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials # <--- NEW LIBRARY
 from prompts import JOB_EXTRACTION_PROMPT
 
 # --- CONFIGURATION ---
@@ -21,23 +21,44 @@ except FileNotFoundError:
     st.error("Secrets not found. If running locally, check .streamlit/secrets.toml")
     st.stop()
 
-# --- GOOGLE SHEETS SETUP ---
+# --- GOOGLE SHEETS FUNCTION ---
 def save_to_google_sheets(data_dict):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    # Authenticate using the dictionary from secrets, not a file path
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_sheets_creds, scope)
-    client = gspread.authorize(creds)
+    # The modern scopes (Google Auth uses slightly different URLs sometimes, but these are standard)
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
     
-    # Open the sheet - MAKE SURE THIS NAME MATCHES EXACTLY
-    sheet_name = "Job Hunt Database" 
     try:
+        # Convert Streamlit secrets to a standard Python dictionary
+        credentials_dict = dict(st.secrets["gcp_service_account"])
+        
+        # Create credentials object
+        creds = Credentials.from_service_account_info(
+            credentials_dict,
+            scopes=scopes
+        )
+        
+        # Authorize gspread
+        client = gspread.authorize(creds)
+        
+        # Open the sheet
+        sheet_name = "Job Hunt Database"  # Make sure this matches exactly!
         sheet = client.open(sheet_name).sheet1
-        # Convert values to string to avoid JSON errors in Sheets
+        
+        # Prepare row data
         row = [str(data_dict.get(k, "")) for k in data_dict.keys()]
+        
+        # Append
         sheet.append_row(row)
         return True
+        
     except Exception as e:
+        # Detailed error logging
         st.error(f"Google Sheets Error: {e}")
+        # If it's a specific API error, try to print the response body
+        if hasattr(e, 'response'):
+             st.write(getattr(e, 'response', 'No response text'))
         return False
 
 # --- MAIN APP ---
