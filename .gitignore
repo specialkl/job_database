@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments (very important to ignore these)
+venv/
+.venv/
+env/
+ENV/
+
+# Streamlit specific
+.streamlit/secrets.toml
+# Note: Keep config.toml if it just has theme settings, 
+# but ignore it if it has sensitive info.
+
+# Environment Variables (CRITICAL for API Keys)
+.env
+.env.local
+
+# Operating System files
+.DS_Store
+Thumbs.db
