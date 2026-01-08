@@ -30,7 +30,7 @@ def save_to_google_sheets(data_dict):
         client = gspread.service_account_from_dict(st.secrets["gcp_service_account"])
         
         # 2. Open the sheet
-        sheet_name = "Job Hunt Database" 
+        sheet_name = "2026 Job Search" 
         sheet = client.open(sheet_name).sheet1
         
         # 3. Prepare row
