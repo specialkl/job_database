@@ -61,9 +61,9 @@ if st.button("Extract & Save", type="primary"):
             # 2. Gemini
             status.info("Asking Gemini...")
             genai.configure(api_key=gemini_key)
-            
+
             model = genai.GenerativeModel(
-                            'gemini-1.5-flash',
+                            'gemini-1.5-flash-latest',
                             system_instruction=JOB_EXTRACTION_PROMPT
                         )
 
