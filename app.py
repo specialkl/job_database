@@ -62,7 +62,7 @@ def save_to_google_sheets(data_dict):
         return False
 
 # --- MAIN APP ---
-st.title("🤖 Job Extractor (Connected to Sheets)")
+st.title("🤖 Job Extractor")
 
 target_url = st.text_input("Paste Job URL:")
 
